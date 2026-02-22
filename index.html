@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekhoade Family Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3c15;
+            --gold: #d4af37;
+            --bg: #f4f6f3;
+            --text: #2c3e50;
+            --card-dark: #12290e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- HEADER --- */
+        .family-crest { width: 80px; height: 80px; margin-bottom: 10px; object-fit: contain; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--primary); margin: 0; }
+        .motto { font-family: 'Playfair Display', serif; font-style: italic; color: var(--gold); font-size: 0.9rem; margin: 5px 0 30px; letter-spacing: 3px; text-transform: uppercase; }
+
+        /* --- MAIN LAYOUT GRID --- */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Mobile Default */
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 992px) {
+            .portal-grid {
+                grid-template-columns: 8fr 2.5fr; /* 80/20 split approximately */
+                align-items: start;
+            }
+        }
+
+        /* --- LEFT COLUMN: HISTORY --- */
+        .profile-card {
+            background: #fff;
+            padding: 35px;
+            border-radius: 20px;
+            border-bottom: 4px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .profile-card h3 { color: var(--primary); margin: 0 0 15px 0; font-family: 'Playfair Display', serif; font-size: 1.8rem; }
+        .profile-card p { font-size: 1.05rem; line-height: 1.8; margin: 0; color: #444; }
+
+        /* --- RIGHT COLUMN: STACKED SIDEBAR --- */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* STACKED LEGACY CARD */
+        .legacy-card {
+            background: var(--card-dark);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column; /* Stacked as requested */
+            gap: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--gold);
+        }
+
+        .address-section { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 6px; display: block; }
+        .address-text { font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
+        
+        .stats-column { display: flex; flex-direction: row; justify-content: space-between; gap: 10px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; display: block; color: #fff; }
+        .stat-desc { font-size: 0.65rem; opacity: 0.7; text-transform: uppercase; }
+
+        /* STACKED FACT CONTAINER */
+        .fact-container {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column; /* Stacked icon and text */
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            min-height: 180px;
+            border-left: 5px solid var(--gold);
+            transition: border-color 0.8s ease;
+        }
+        .fact-icon-box { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; transition: background-color 0.8s ease; background-color: #fdf6e3; }
+        #fact-text { font-size: 0.85rem; color: #555; transition: opacity 0.8s; line-height: 1.5; font-weight: 500; }
+
+        /* --- SEARCH & TREE --- */
+        .search-bar { width: 100%; max-width: 600px; padding: 15px 25px; border-radius: 30px; border: 1px solid #ccc; margin-bottom: 25px; outline-color: var(--primary); font-size: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .tree-container { width: 100%; max-width: 600px; }
+        ul { list-style: none; padding-left: 20px; border-left: 1px solid #ddd; margin: 0; }
+        .tree-container > ul { padding-left: 0; border-left: none; }
+        li { margin: 12px 0; }
+        .node { background: white; padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid transparent; }
+        .node:hover { border-color: var(--gold); }
+        .node.active { background: var(--primary); color: white; }
+        .node.highlight { border: 2px solid var(--gold); background: #fffcf0; transform: scale(1.02); }
+        .gen-badge { font-size: 0.65rem; background: #eee; padding: 3px 7px; border-radius: 4px; margin-right: 10px; font-weight: bold; color: #444; }
+        .active .gen-badge { background: rgba(255,255,255,0.2); color: white; }
+        .children-container { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .expanded > .children-container { max-height: 5000px; }
+    </style>
+</head>
+<body>
+
+    <img src="crest.png" alt="Family Crest" class="family-crest" onerror="this.style.display='none'">
+    <h1>EKHOADE</h1>
+    <p class="motto">Honour &bull; Unity &bull; Integrity</p>
+    
+    <div class="portal-grid">
+        <div class="profile-card">
+            <h3>The Proud Heritage of the Ekhoade Family</h3>
+            <p>The <strong>Ekhoade Family</strong> stands as a beacon of <strong>honor, unity, and integrity</strong>. Across generations, the family has upheld a standard of dignity and close-knit bonds, ensuring that every member reflects these foundational values. <br><br> As a vital branch of the <strong>Iviuefo kindred of Iviukwe</strong>, located in the heart of the <strong>Uwanno Kingdom (Etsako East, Edo State)</strong>, the Ekhoade lineage continues to nurture a legacy of excellence. Our roots are deeply intertwined with the history of Agenebode, thriving from its 16th-century origins into a modern era of cultural pride and communal strength.</p>
+        </div>
+
+        <div class="sidebar">
+            <div class="legacy-card">
+                <div class="address-section">
+                    <span class="label">Ancestral Home</span>
+                    <div class="address-text">Iviukwe Town,<br>Uwanno Kingdom,<br>Edo State, Nigeria</div>
+                </div>
+                <div class="stats-column">
+                    <div class="stat-group"><span class="stat-value">04</span><span class="stat-desc">Generations</span></div>
+                    <div class="stat-group"><span class="stat-value" id="memberCount">0</span><span class="stat-desc">Members</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="fact-container" id="factContainer">
+        <div class="fact-icon-box" id="factIcon">🏠</div>
+        <div id="fact-text">Agenebode means "We will no longer (wish to) pass ourselves"—a testament to our final abode.</div>
+    </div>
+
+    <input type="text" id="memberSearch" class="search-bar" placeholder="Search lineage by name...">
+
+    <div class="tree-container" id="familyTree"></div>
+
+    <script>
+        // Family Data and Script remains exactly the same logic-wise
+        const familyData = {
+            name: "Ekhoade",
+            children: [
+                { name: "Ivhalue", children: [{ name: "Ogianyo", children: [{ name: "Jimoh" }, { name: "M. B. Sule" }, { name: "Dupe" }, { name: "Others" }] }] },
+                { name: "Ikhoyameh", children: [{ name: "Igemho" }, { name: "Imhava", children: [{ name: "Kelly" }, { name: "Anthony" }, { name: "Okeke" }, { name: "Okey" }, { name: "Ekutos" }, { name: "Nkiru" }, { name: "Enike" }, { name: "Oleghie" }] }, { name: "Omoudu" }, { name: "Ivhetsebu" }, { name: "Ayepue" }] },
+                { name: "Emhoakemhe", children: [{ name: "Musa", children: [{ name: "Medu" }] }] }
+            ]
+        };
+
+        const facts = [
+            { text: "Agenebode means 'We will no longer pass ourselves'—an expression of finality from our 16th-century ancestors.", color: "#FFD700", icon: "🏠" },
+            { text: "By 1870, Agenebode transformed from a fishing post to a major European merchant capital.", color: "#FFC107", icon: "🚢" },
+            { text: "Geographically, our land is bounded by the River Niger and Idah in Igala land to the East.", color: "#FFB300", icon: "🗺️" },
+            { text: "The separation of Weppa and Uwanno (2018) ended 70 years of agitation during the reign of the late Okumagbe George Egabor.", color: "#FF9800", icon: "⚖️" },
+            { text: "The Weppa-Uwanno people are known for an 'easy-going' nature and a culture rich enough to inspire the whole nation.", color: "#FF5722", icon: "✨" },
+            { text: "To the North, our territory is bounded by Okene in Ebira land; to the West, by the Okpekpe clan.", color: "#F4511E", icon: "📍" },
+            { text: "Community leadership historically included influential Okumagbes guiding social and political decisions.", color: "#512DA8", icon: "👑" },
+            { text: "The River Niger played a central role in trade, transport, and daily life.", color: "#7B1FA2", icon: "🌊" }
+        ];
+        
+        let factIndex = 0;
+        const factText = document.getElementById('fact-text');
+        const factContainer = document.getElementById('factContainer');
+        const factIcon = document.getElementById('factIcon');
+
+        setInterval(() => {
+            factText.style.opacity = 0;
+            setTimeout(() => {
+                factIndex = (factIndex + 1) % facts.length;
+                const currentFact = facts[factIndex];
+                factText.innerText = currentFact.text;
+                factIcon.innerText = currentFact.icon;
+                factContainer.style.borderColor = currentFact.color;
+                factIcon.style.backgroundColor = currentFact.color + "22";
+                factIcon.style.color = currentFact.color;
+                factText.style.opacity = 1;
+            }, 800);
+        }, 10000);
+
+        let totalMembers = 0;
+        function createNode(person, level = 1) {
+            totalMembers++;
+            const li = document.createElement("li");
+            const hasChildren = person.children && person.children.length > 0;
+            const nodeDiv = document.createElement("div");
+            nodeDiv.className = "node";
+            nodeDiv.dataset.name = person.name.toLowerCase();
+            nodeDiv.innerHTML = `<div><span class="gen-badge">G${level}</span>${person.name}</div>${hasChildren ? '<span>▼</span>' : ''}`;
+            li.appendChild(nodeDiv);
+            if (hasChildren) {
+                const childUl = document.createElement("ul");
+                childUl.className = "children-container";
+                person.children.forEach(child => childUl.appendChild(createNode(child, level + 1)));
+                li.appendChild(childUl);
+                nodeDiv.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const siblings = li.parentElement.children;
+                    for (let s of siblings) { if (s !== li) { s.classList.remove("expanded"); const sn = s.querySelector(".node"); if(sn) sn.classList.remove("active"); } }
+                    li.classList.toggle("expanded");
+                    nodeDiv.classList.toggle("active");
+                });
+            }
+            return li;
+        }
+
+        const root = createNode(familyData);
+        document.getElementById("familyTree").appendChild(document.createElement("ul")).appendChild(root);
+        document.getElementById("memberCount").innerText = totalMembers < 10 ? `0${totalMembers}` : totalMembers;
+
+        document.getElementById('memberSearch').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.highlight').forEach(n => n.classList.remove('highlight'));
+            if (term.length < 2) return;
+            document.querySelectorAll('.node').forEach(node => {
+                if (node.dataset.name.includes(term)) {
+                    node.classList.add('highlight');
+                    let parent = node.parentElement.parentElement;
+                    while (parent && parent.classList.contains('children-container')) {
+                        parent.parentElement.classList.add('expanded');
+                        parent.parentElement.querySelector('.node').classList.add('active');
+                        parent = parent.parentElement.parentElement;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
