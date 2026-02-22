@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -303,14 +302,34 @@
             nodeDiv.className = "node";
             nodeDiv.dataset.name = person.name.toLowerCase();
             nodeDiv.innerHTML = `<div><span class="gen-badge">G${level}</span>${person.name}</div>${hasChildren ? '<span>▼</span>' : ''}`;
+            
             li.appendChild(nodeDiv);
+
             if (hasChildren) {
                 const childUl = document.createElement("ul");
                 childUl.className = "children-container";
                 person.children.forEach(child => childUl.appendChild(createNode(child, level + 1)));
                 li.appendChild(childUl);
+
                 nodeDiv.addEventListener("click", (e) => {
                     e.stopPropagation();
+
+                    // ACCORDION LOGIC: Collapse siblings
+                    const isOpening = !li.classList.contains("expanded");
+                    
+                    if (isOpening) {
+                        const siblings = li.parentElement.children;
+                        for (let sibling of siblings) {
+                            if (sibling !== li) {
+                                sibling.classList.remove("expanded");
+                                // Also remove the 'active' (dark green) state from sibling nodes
+                                const siblingNode = sibling.querySelector(".node");
+                                if (siblingNode) siblingNode.classList.remove("active");
+                            }
+                        }
+                    }
+
+                    // Toggle the clicked branch
                     li.classList.toggle("expanded");
                     nodeDiv.classList.toggle("active");
                 });
